@@ -5,10 +5,14 @@ const { courseRouter } = require('./routes/course')
 
 const app = express();
 connectDB();
+console.log('before');
 
-app.use('/user', userRouter)
-app.use('/course', courseRouter)
+app.use('/api/v1/user', userRouter)
+console.log('user');
 
+app.use('/api/v1/course', courseRouter)
+
+console.log('course');
 
 
 
