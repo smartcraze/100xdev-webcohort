@@ -1,6 +1,8 @@
 const { Router } = require('express')
-const adminRouter = Router();
+const { adminModel } = require('../models/schema')
 
+
+const adminRouter = Router();
 // adminRouter.use(adminMiddleware)
 
 adminRouter.post('/signup', async function (req, res) {

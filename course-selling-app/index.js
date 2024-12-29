@@ -3,7 +3,7 @@ const { connectDB } = require('./db/db')
 const { userRouter } = require('./routes/user')
 const { adminRouter } = require('./routes/admin')
 const { courseRouter } = require('./routes/course')
-
+require('dotenv').config();
 
 const app = express();
 connectDB();
