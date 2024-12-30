@@ -1,8 +1,8 @@
 const { Router } = require('express')
-const { z } = require('zod')
 const { userModel } = require('../models/schema')
-const bcrypt = require('bcrypt')
 const userRouter = Router();
+const bcrypt = require('bcrypt')
+const { z } = require('zod')
 const jwt = require('jsonwebtoken');
 
 userRouter.post('/signup', async function (req, res) {

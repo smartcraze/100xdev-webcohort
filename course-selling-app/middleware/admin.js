@@ -9,11 +9,11 @@ function adminMiddleware(req, res, next) {
             msg: "Token is required"
         })
     }
-    jwt.verify(token, process.env.JWT_SECRET, (err, decode) => {
+    jwt.verify(token, process.env.JWT_ADMIN_SECRET, (err, decode) => {
         if (err) {
             res.json({
                 success: false,
-                msg: "Invalide token"
+                msg: "You are Not SignedIn"
             })
         }
         req.userId = decode.id
