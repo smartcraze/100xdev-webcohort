@@ -150,16 +150,78 @@ adminRouter.post('/course', adminMiddleware, async function (req, res) {
     }
 
 })
-adminRouter.put('/course', async function (req, res) {
-    res.json({
-        msg: "user purchasing course"
-    })
-})
-adminRouter.get('/course/bulk', async function (req, res) {
-    res.json({
-        msg: "user purchasing course"
-    })
-})
+
+adminRouter.put('/course', adminMiddleware, async function (req, res) {
+    const creatorId = req.userId; 
+
+
+    const courseSchema = z.object({
+        courseId: z.string().min(1, "Course ID is required"),
+        title: z.string().min(1, "Title is required"),
+        description: z.string().min(1, "Description is required"),
+        price: z.number().positive("Price must be a positive number"),
+        imageUrl: z.string().url("Invalid URL format"),
+    });
+
+    const validationResult = courseSchema.safeParse(req.body);
+    if (!validationResult.success) {
+        return res.status(400).json({
+            success: false,
+            message: "Validation failed",
+            errors: validationResult.error.errors,
+        });
+    }
+
+    const { courseId, title, description, price, imageUrl } = validationResult.data;
+
+    try {
+        const course = await courseModel.findOne({ _id: courseId, creatorId });
+        if (!course) {
+            return res.status(404).json({
+                success: false,
+                message: "Course not found or you are not authorized to update this course",
+            });
+        }
+
+        await courseModel.updateOne(
+            { _id: courseId, creatorId },
+            { title, description, price, imageUrl }
+        );
+
+        res.status(200).json({
+            success: true,
+            message: "Course updated successfully",
+        });
+    } catch (error) {
+        console.error("Error updating course:", error.message);
+        res.status(500).json({
+            success: false,
+            message: "Internal Server Error",
+            error: error.message,
+        });
+    }
+});
+
+
+
+adminRouter.get('/course/bulk', adminMiddleware, async function (req, res) {
+    try {
+        const creatorId = req.userId;
+        const allCourses = await courseModel.find({ creatorId });
+
+        res.status(200).json({
+            success: true,
+            message: "Fetched courses successfully",
+            courses: allCourses,
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Internal Server Error",
+            error: error.message,
+        });
+    }
+});
 
 
 module.exports = { adminRouter }
