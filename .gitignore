@@ -1,0 +1,58 @@
+# Node.js
+node_modules/
+**/node_modules/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment variables
+.env
+**/.env
+.env.local
+**/.env.local
+
+# Build directories
+build/
+dist/
+**/build/
+**/dist/
+
+# Dependency directories
+bower_components/
+**/bower_components/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Coverage reports
+coverage/
+**/coverage/
+*.lcov
+*.lcov-report
+
+# Miscellaneous
+*.lock
+*.bak
+*.tmp
+*.temp
+*.cache/
+**/.cache/
+
+# Ignore generated files
+*.min.js
+*.min.css
+
+# Git files
+*.orig
