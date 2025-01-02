@@ -1,47 +1,63 @@
-import React from "react";
-import "./App.css";
-import { createContext } from "react";
-import { useState } from "react";
-import { useContext } from "react";
-
-const Bulbcontext = createContext();
-
-/*
- * create context
- * make provider
- */
+import React, { useContext } from "react";
+import { Authcontext, AuthProvider } from "./Authcontext";
 
 function App() {
-  const [bulb, setBulb] = useState(false);
-
   return (
     <div>
-      <Bulbcontext.Provider
-        value={{
-          bulb,
-          setBulb,
-        }}
-      >
-        <Light />
-        <ToggleButton />
-      </Bulbcontext.Provider>
+      <AuthProvider>
+        <Navbar />
+        <Dashboard />
+      </AuthProvider>
     </div>
   );
 }
 
-function Light() {
-  const { bulb } = useContext(Bulbcontext);
-  return <div>{bulb ? "Light on" : "Light off"}</div>;
+function Navbar() {
+  return (
+    <nav
+      style={{ padding: "10px", backgroundColor: "#282c34", color: "white" }}
+    >
+      <h1>My App</h1>
+      <LoginButton />
+      <LogoutButton />
+    </nav>
+  );
 }
-function ToggleButton() {
-  const { setBulb } = useContext(Bulbcontext);
-  function togglebtn() {
-    setBulb((bulb) => !bulb);
+
+function Dashboard() {
+  const { user, isLoggedin, setUser } = useContext(Authcontext);
+  function handlechange(e) {
+    setUser(e.target.value);
   }
   return (
     <div>
-      <button onClick={togglebtn}>Toggle</button>
+      <input onChange={handlechange} type="text" />
+      <h1>Hi Welcome {user}</h1>
+      <h1>{isLoggedin ? "You are LogedIn" : "You are LogedOuT"}</h1>
     </div>
   );
 }
+
+function LoginButton() {
+  const { setUser, setIsLoggedin } = useContext(Authcontext);
+
+  function Login() {
+    setIsLoggedin(true);
+  }
+  return (
+    <div>
+      <button onClick={Login}>Login </button>
+    </div>
+  );
+}
+
+function LogoutButton() {
+  const { setIsLoggedin } = useContext(Authcontext);
+
+  function Logout() {
+    setIsLoggedin(false);
+  }
+  return <button onClick={Logout}>Logout </button>;
+}
+
 export default App;
