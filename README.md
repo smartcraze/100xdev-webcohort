@@ -35,10 +35,8 @@ Feel free to:
 
 This is an ongoing project, and I’m always looking for ways to improve. If you have feedback, suggestions, or resources to share, feel free to reach out or open an issue.
 
----
+
 
 ### Happy Learning! 😊
 
---- 
 
-You can expand or adjust this as needed!
