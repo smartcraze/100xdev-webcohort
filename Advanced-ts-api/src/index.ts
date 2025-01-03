@@ -32,3 +32,5 @@ const updatedProps: Updatedprops = {
 };
 
 console.log(partialUser);
+console.log(readonlyUser);
+console.log(updatedProps);
