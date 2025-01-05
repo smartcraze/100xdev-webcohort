@@ -27,5 +27,5 @@ const ContentSchema = new Schema({
   },
 });
 
-const Content = model("User", ContentSchema);
+const Content = model("Contents", ContentSchema);
 export default Content;

@@ -5,4 +5,5 @@ const linkSchema = new Schema({
   userId: { type: Types.ObjectId, ref: "User", required: true },
 });
 
-export default model("Link", linkSchema);
+const Link = model("Link", linkSchema);
+export default Link;
