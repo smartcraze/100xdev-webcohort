@@ -1,16 +1,17 @@
 import mongoose from "mongoose";
 
 async function dbConnect() {
+  if (!process.env.MONGO_URI) {
+    throw new Error("MONGO_URI environment variable is not defined.");
+  }
+
   try {
-    await mongoose.connect(
-      "mongodb+srv://admin:Born2code%40admin@cohort3.0f0h7.mongodb.net/brainly"
-    );
-    console.log("Database connected successfully");
+    await mongoose.connect(process.env.MONGO_URI);
+    console.log("✅ Database connected successfully");
   } catch (error) {
-    if (error) {
-      console.log("Database connection failed");
-      console.log(error);
-    }
+    console.error("❌ Database connection failed:");
+    console.error(error);
+    process.exit(1);
   }
 }
 

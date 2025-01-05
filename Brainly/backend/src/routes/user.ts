@@ -1,5 +1,6 @@
 import { Router } from "express";
 import z from "zod";
+import bcrypt from "bcrypt";
 import User from "../Models/usermodel";
 export const userRouter = Router();
 
@@ -22,9 +23,10 @@ userRouter.post("/singup", async (req, res) => {
         Message: "User Already Exist",
       });
     }
+    const hashedpassword = await bcrypt.hash(password, 10);
     const user = await User.create({
       username,
-      password,
+      hashedpassword,
     });
     res.status(200).json({
       Message: "User Created",
@@ -38,8 +40,26 @@ userRouter.post("/singup", async (req, res) => {
   }
 });
 
-userRouter.get("/singup", (req, res) => {
-  res.status(200).json({
-    Message: "User Get",
-  });
+userRouter.post("/signin", async (req, res) => {
+  try {
+    const { username, password } = userSchema.parse(req.body);
+    if (!username || !password) {
+      res.status(411).json({
+        Message: "Please Provide Username and Password",
+      });
+    }
+    const user = await User.findOne({ username });
+    if (!user) {
+      res.status(404).json({
+        Message: "User Not Found",
+      });
+    }
+    const isPasswordMatch = await bcrypt.compare(password, user.password);
+
+  } catch (error: any) {
+    res.status(500).json({
+      Message: "Internal Server Error",
+      error: error.message,
+    });
+  }
 });
