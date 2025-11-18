@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Authentication System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        input {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .message {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 3px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="auth-section">
+        <div class="section">
+            <h1>Register</h1>
+            <form id="register-form">
+                <input type="text" id="register-name" name="name" placeholder="Name" required>
+                <input type="email" id="register-email" name="email" placeholder="Email" required>
+                <input type="password" id="register-password" name="password" placeholder="Password" required>
+                <button type="submit">Register</button>
+            </form>
+            <div id="register-message"></div>
+        </div>
+
+        <div class="section">
+            <h1>Login</h1>
+            <form id="login-form">
+                <input type="email" id="login-email" name="email" placeholder="Email" required>
+                <input type="password" id="login-password" name="password" placeholder="Password" required>
+                <button type="submit">Login</button>
+            </form>
+            <div id="login-message"></div>
+        </div>
+    </div>
+
+    <div id="dashboard-section" class="section hidden">
+        <h1>Dashboard</h1>
+        <h2>Welcome, <span id="user-name"></span>!</h2>
+        <p><strong>Email:</strong> <span id="user-email"></span></p>
+        <button id="logout-btn">Logout</button>
+    </div>
+
+    <script>
+        const registerForm = document.getElementById('register-form');
+        const loginForm = document.getElementById('login-form');
+        const logoutBtn = document.getElementById('logout-btn');
+        const authSection = document.getElementById('auth-section');
+        const dashboardSection = document.getElementById('dashboard-section');
+
+        // Register handler
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('register-name').value;
+            const email = document.getElementById('register-email').value;
+            const password = document.getElementById('register-password').value;
+
+            try {
+                const response = await fetch('/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ name, email, password }),
+                });
+
+                const messageDiv = document.getElementById('register-message');
+                if (response.ok) {
+                    const text = await response.text();
+                    messageDiv.className = 'message success';
+                    messageDiv.textContent = text;
+                    registerForm.reset();
+                } else {
+                    const text = await response.text();
+                    messageDiv.className = 'message error';
+                    messageDiv.textContent = text;
+                }
+            } catch (error) {
+                const messageDiv = document.getElementById('register-message');
+                messageDiv.className = 'message error';
+                messageDiv.textContent = 'Error: ' + error.message;
+            }
+        });
+
+        // Login handler
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password }),
+                    credentials: 'include',
+                });
+
+                const messageDiv = document.getElementById('login-message');
+                if (response.ok) {
+                    messageDiv.className = 'message success';
+                    messageDiv.textContent = 'Login successful!';
+                    loginForm.reset();
+                    
+                    // Load profile
+                    loadProfile();
+                } else {
+                    const text = await response.text();
+                    messageDiv.className = 'message error';
+                    messageDiv.textContent = text;
+                }
+            } catch (error) {
+                const messageDiv = document.getElementById('login-message');
+                messageDiv.className = 'message error';
+                messageDiv.textContent = 'Error: ' + error.message;
+            }
+        });
+
+        // Load profile
+        async function loadProfile() {
+            try {
+                const response = await fetch('/profile', {
+                    credentials: 'include',
+                });
+
+                if (response.ok) {
+                    const user = await response.json();
+                    document.getElementById('user-name').textContent = user.name;
+                    document.getElementById('user-email').textContent = user.email;
+                    authSection.classList.add('hidden');
+                    dashboardSection.classList.remove('hidden');
+                }
+            } catch (error) {
+                console.error('Error loading profile:', error);
+            }
+        }
+
+        // Logout handler
+        logoutBtn.addEventListener('click', async () => {
+            try {
+                const response = await fetch('/logout', {
+                    method: 'POST',
+                    credentials: 'include',
+                });
+
+                if (response.ok) {
+                    authSection.classList.remove('hidden');
+                    dashboardSection.classList.add('hidden');
+                    document.getElementById('login-message').textContent = '';
+                    document.getElementById('register-message').textContent = '';
+                }
+            } catch (error) {
+                console.error('Error logging out:', error);
+            }
+        });
+
+        // Check if user is already logged in on page load
+        loadProfile();
+    </script>
+</body>
+</html>
