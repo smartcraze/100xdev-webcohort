@@ -1,0 +1,98 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id            String           @id @default(uuid())
+  email         String           @unique
+  password      String
+  payments      PaymentHistory[]
+  courseAccess  CourseAccess[]
+  subscriptions Subscription[]
+}
+
+model Course {
+  id               String           @id @default(uuid())
+  title            String
+  access           CourseAccess[]
+  subscriptions    Subscription[]
+  paymentHistories PaymentHistory[]
+}
+
+model CourseAccess {
+  id        String       @id @default(uuid())
+  userId    String
+  courseId  String
+  expiresAt DateTime
+  status    AccessStatus @default(ACTIVE)
+
+  user   User   @relation(fields: [userId], references: [id])
+  course Course @relation(fields: [courseId], references: [id])
+
+  @@unique([userId, courseId])
+}
+
+model PaymentHistory {
+  id                     String        @id @default(uuid())
+  userId                 String
+  courseId               String
+  paymentType            PaymentType
+  planType               PlanType
+  status                 PaymentStatus @default(PENDING)
+  razorpayOrderId        String?
+  razorpayPaymentId      String?
+  razorpaySubscriptionId String?
+  amount                 Int
+  currency               String
+  createdAt              DateTime      @default(now())
+  updatedAt              DateTime      @updatedAt
+  user                   User          @relation(fields: [userId], references: [id])
+  course                 Course        @relation(fields: [courseId], references: [id])
+}
+
+model Subscription {
+  id                     String             @id @default(uuid())
+  userId                 String
+  courseId               String
+  planType               PlanType
+  currency               String
+  razorpaySubscriptionId String             @unique
+  currentPeriodEnd       DateTime
+  status                 SubscriptionStatus @default(ACTIVE)
+  createdAt              DateTime           @default(now())
+  updatedAt              DateTime           @updatedAt
+  user                   User               @relation(fields: [userId], references: [id])
+  course                 Course             @relation(fields: [courseId], references: [id])
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+}
+
+enum PaymentType {
+  ORDER
+  SUBSCRIPTION
+}
+
+enum PlanType {
+  MONTHLY
+  YEARLY
+}
+
+enum AccessStatus {
+  ACTIVE
+  EXPIRED
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELLED
+  EXPIRED
+}

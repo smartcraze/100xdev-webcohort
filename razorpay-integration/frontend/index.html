@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Platform</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <h1>Course Platform</h1>
+            <div id="nav-buttons">
+                <button onclick="showLogin()">Login</button>
+                <button onclick="showSignup()">Signup</button>
+            </div>
+        </nav>
+
+        <!-- Login Form -->
+        <div id="login-section" class="section">
+            <h2>Login</h2>
+            <form id="login-form">
+                <input type="email" id="login-email" placeholder="Email" required>
+                <input type="password" id="login-password" placeholder="Password" required>
+                <button type="submit">Login</button>
+            </form>
+            <p>Don't have an account? <a href="#" onclick="showSignup()">Signup</a></p>
+        </div>
+
+        <!-- Signup Form -->
+        <div id="signup-section" class="section hidden">
+            <h2>Signup</h2>
+            <form id="signup-form">
+                <input type="email" id="signup-email" placeholder="Email" required>
+                <input type="password" id="signup-password" placeholder="Password" required>
+                <button type="submit">Signup</button>
+            </form>
+            <p>Already have an account? <a href="#" onclick="showLogin()">Login</a></p>
+        </div>
+
+        <!-- Courses Section -->
+        <div id="courses-section" class="section hidden">
+            <h2>Available Courses</h2>
+            <div id="courses-list"></div>
+        </div>
+
+        <!-- My Courses Section -->
+        <div id="my-courses-section" class="section hidden">
+            <h2>My Courses</h2>
+            <div id="my-courses-list"></div>
+        </div>
+    </div>
+
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
