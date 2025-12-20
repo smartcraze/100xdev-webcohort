@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>WebRTC Test</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        display: flex;
+        gap: 20px;
+        padding: 20px;
+      }
+      video {
+        width: 300px;
+        border: 2px solid black;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div>
+      <h3>Local</h3>
+      <video id="localVideo" autoplay muted playsinline></video>
+    </div>
+
+    <div>
+      <h3>Remote</h3>
+      <video id="remoteVideo" autoplay playsinline></video>
+    </div>
+
+    <script>
+      const WS_URL = "ws://localhost:8080";
+      const ROOM_ID = "room123";
+
+      let role = null;
+
+      alert("Page loaded");
+
+      // 1️⃣ WebSocket
+      const ws = new WebSocket(WS_URL);
+
+      // 2️⃣ PeerConnection
+      const pc = new RTCPeerConnection({
+        iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
+      });
+
+      // 3️⃣ Get camera + mic
+      navigator.mediaDevices
+        .getUserMedia({ video: true, audio: true })
+        .then((stream) => {
+          alert("Camera + mic granted");
+
+          document.getElementById("localVideo").srcObject = stream;
+
+          stream.getTracks().forEach((track) => {
+            pc.addTrack(track, stream);
+          });
+        })
+        .catch(() => {
+          alert("❌ Camera permission failed");
+        });
+
+      // 4️⃣ ICE candidates
+      pc.onicecandidate = (event) => {
+        if (event.candidate) {
+          alert("ICE generated");
+          ws.send(
+            JSON.stringify({
+              type: "ice",
+              roomId: ROOM_ID,
+              candidate: event.candidate,
+            })
+          );
+        }
+      };
+
+      // 5️⃣ Remote stream
+      pc.ontrack = (event) => {
+        alert("🎥 Remote stream received");
+        document.getElementById("remoteVideo").srcObject =
+          event.streams[0];
+      };
+
+      pc.onconnectionstatechange = () => {
+        alert("Connection state: " + pc.connectionState);
+        console.log("Connection state:", pc.connectionState);
+      };
+
+      // 6️⃣ WebSocket open
+      ws.onopen = () => {
+        alert("WebSocket connected");
+        ws.send(
+          JSON.stringify({
+            type: "join",
+            roomId: ROOM_ID,
+          })
+        );
+      };
+
+      // 7️⃣ Signaling messages
+      ws.onmessage = async (event) => {
+        const data = JSON.parse(event.data);
+        alert("WS message: " + data.type);
+        console.log("WS:", data);
+
+        switch (data.type) {
+          case "role":
+            role = data.role;
+            alert("Role: " + role);
+            break;
+
+          case "peer-ready":
+            if (role === "caller") {
+              alert("Creating OFFER");
+
+              const offer = await pc.createOffer();
+              await pc.setLocalDescription(offer);
+
+              ws.send(
+                JSON.stringify({
+                  type: "offer",
+                  roomId: ROOM_ID,
+                  sdp: offer,
+                })
+              );
+            }
+            break;
+
+          case "offer":
+            alert("OFFER received");
+
+            await pc.setRemoteDescription(data.sdp);
+
+            const answer = await pc.createAnswer();
+            await pc.setLocalDescription(answer);
+
+            ws.send(
+              JSON.stringify({
+                type: "answer",
+                roomId: ROOM_ID,
+                sdp: answer,
+              })
+            );
+            break;
+
+          case "answer":
+            alert("ANSWER received");
+            await pc.setRemoteDescription(data.sdp);
+            break;
+
+          case "ice":
+            alert("ICE received");
+            await pc.addIceCandidate(data.candidate);
+            break;
+        }
+      };
+    </script>
+  </body>
+</html>
