@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Node.js
 node_modules/
 **/node_modules/
@@ -59,3 +60,39 @@ coverage/
 Brainly/Brainly-frontend
 suraj Vishwakarma ki repository hae 
 Brainly/Brainly-frontend
+=======
+# dependencies (bun install)
+node_modules
+
+# output
+out
+dist
+*.tgz
+
+# code coverage
+coverage
+*.lcov
+
+# logs
+logs
+_.log
+report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
+
+# dotenv environment variable files
+.env
+.env.development.local
+.env.test.local
+.env.production.local
+.env.local
+
+# caches
+.eslintcache
+.cache
+*.tsbuildinfo
+
+# IntelliJ based IDEs
+.idea
+
+# Finder (MacOS) folder config
+.DS_Store
+>>>>>>> c0587ff (practice background jobs)
